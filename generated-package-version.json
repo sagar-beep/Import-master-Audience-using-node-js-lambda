@@ -1,0 +1,14 @@
+{
+  "packageVersion": "1.0.0",
+  "svnInfo": {
+    "path": "mailchimp-master-audience",
+    "url": "https://repo.vitechinc.com/repos/nextgen/trunk/lambdas/mailchimp-master-audience",
+    "relativeUrl": "^/nextgen/trunk/lambdas/mailchimp-master-audience",
+    "repositoryRoot": "https://repo.vitechinc.com/repos",
+    "repositoryUuid": "f8820745-06df-5641-819d-33435461f7b1",
+    "revision": "1636329",
+    "nodeKind": "directory",
+    "lastChangedAuthor": "sraghunathan",
+    "lastChangedDate": "2021-08-11 07:47:10 -0400 (Wed, 11 Aug 2021)"
+  }
+}

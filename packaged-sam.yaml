@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless Express Application/API powered by API Gateway and Lambda
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+  campaignMailChimpAudienceImport:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://campaigns-deploy/60ea5b84690446b66d3e73f7ba396995
+      Handler: index.handler
+      MemorySize: 1024
+      Role: arn:aws:iam::866159464259:role/lambda-campaign-config-role
+      Runtime: nodejs12.x
+      Timeout: 30
+      Environment:
+        Variables:
+          REGION: us-east-1
+          ATHENA_INFO: campaigns_v310pgdev
+      VpcConfig:
+        SecurityGroupIds:
+        SubnetIds:
+      Tags:
+        Name: Campaign
+        client: ngss
+        category: app
+        env: non-prod
+  campaignMailChimpAudienceImportRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Campaign Mailchimp Audience Import
+      ScheduleExpression: cron(00 00 * * ? *)
+      State: ENABLED
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - campaignMailChimpAudienceImport
+              - Arn
+          Id: campaignMailChimpAudienceImportRuleV1
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: campaignMailChimpAudienceImport
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - campaignMailChimpAudienceImportRule
+          - Arn
